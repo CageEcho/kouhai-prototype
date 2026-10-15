@@ -72,6 +72,7 @@ p{margin:0}
 
 .av{--c:#FFB800;display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--c);color:#15171C;font-weight:700;font-size:15px;flex:none;text-decoration:none}
 .av.sm{width:22px;height:22px;font-size:11px}
+.av.ghost{background:var(--surface-2);color:var(--ink-3);box-shadow:inset 0 0 0 1px var(--ink-3)}
 .av.md{width:44px;height:44px;font-size:18px}
 .av.xl{width:112px;height:112px;font-size:46px;box-shadow:0 0 0 5px var(--bg)}
 
@@ -128,7 +129,7 @@ p{margin:0}
 .card:hover .cover canvas{transform:scale(1.035)}
 .st{position:absolute;left:10px;top:10px;display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .st i,.stx i{width:7px;height:7px;border-radius:50%;background:var(--c)}
-.st-iterating{--c:var(--ok)} .st-launched{--c:var(--live)} .st-funded{--c:var(--fund)} .st-sleeping{--c:var(--sleep)}
+.st-iterating{--c:var(--ok)} .st-launched{--c:var(--live)} .st-funded{--c:var(--fund)} .st-sleeping{--c:var(--sleep)} .st-unclaimed{--c:var(--warn)}
 .st-iterating i{animation:blink 2s infinite}
 .award{position:absolute;right:10px;bottom:10px;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:800;padding:3px 9px;border-radius:4px;transform:rotate(-3deg);box-shadow:0 2px 0 rgba(0,0,0,.18)}
 .c-meta{padding:10px 2px 0;display:grid;gap:4px}
@@ -192,6 +193,18 @@ p{margin:0}
 .tl li.now .dot{background:var(--accent);border-color:var(--ink)}
 .tl li span.t{font-size:14px}
 .stack{display:flex;gap:8px;flex-wrap:wrap}
+.lic{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--ink-2)}
+.lic b{font-family:var(--f-mono);color:var(--ink);font-size:13px}
+.life.fresh p{color:var(--ink-2);max-width:40em;font-size:14.5px}
+.life.fresh .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.adopt .btn[disabled]{opacity:.7;cursor:default}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-weight:400}
+.opt:has(input:checked){border-color:var(--ink);background:var(--bg)}
+.opt input{margin-top:5px;accent-color:var(--ink)}
+.opt b{display:block;font-size:14px}
+.opt small{display:block;color:var(--ink-2);font-size:12.5px;margin:2px 0 0!important;font-weight:400}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink-2);cursor:pointer}
+.chk input{margin-top:4px;accent-color:var(--ink)}
 .stack span{font-family:var(--f-mono);font-size:12.5px;padding:5px 11px;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
 
 .box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
@@ -425,10 +438,30 @@ footer b{font-family:var(--f-display);font-weight:400;font-size:18px;color:var(-
         <div class="fld"><label for="pf-status">现在的状态</label>
           <select class="in" id="pf-status"><option value="iterating">持续迭代</option><option value="launched">已上线</option><option value="funded">获投资</option><option value="sleeping">待唤醒（开放接手）</option></select></div>
       </div>
-      <div class="fld"><label for="pf-stack">技术栈<small>用逗号分隔</small></label><input class="in" id="pf-stack" placeholder="Next.js, Supabase, Claude API"></div>
+      <div class="two">
+        <div class="fld"><label for="pf-stack">技术栈<small>用逗号分隔</small></label><input class="in" id="pf-stack" placeholder="Next.js, Supabase"></div>
+        <div class="fld"><label for="pf-license">开源协议</label>
+          <select class="in" id="pf-license"><option value="MIT">MIT</option><option value="Apache-2.0">Apache-2.0</option><option value="GPL-3.0">GPL-3.0</option><option value="CC BY-NC 4.0">CC BY-NC 4.0（非代码作品）</option><option value="保留所有权利">保留所有权利</option></select></div>
+      </div>
       <div class="fld"><label>封面风格<small>原型里用生成封面代替上传</small></label><div class="cov-pick" id="pf-cov"></div></div>
+      <p style="font-size:12.5px;color:var(--ink-3)">选择「待唤醒（开放接手）」时，需要选一个允许他人继续开发的协议。</p>
       <p class="err" id="pf-err" hidden></p>
       <div class="dlg-f"><small>发布后会生成作品主页和赛后提交记录，评委、企业和投资人都能看到。</small><button class="btn btn-y" type="submit">发布</button></div>
+    </div>
+  </form>
+</dialog>
+<dialog id="claim" aria-labelledby="claim-h">
+  <form id="claim-form" novalidate>
+    <div class="dlg-h"><h2 id="claim-h">认领作品</h2><button type="button" class="x" data-act="close-claim" aria-label="关闭"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-b">
+      <p id="claim-name" style="font-size:15px;font-weight:600"></p>
+      <div class="fld"><span style="font-size:13px;font-weight:600">验证方式</span>
+        <label class="opt" for="cv-repo"><input type="radio" name="cv" id="cv-repo" value="repo" checked><span><b>绑定代码仓库</b><small>用 GitHub 或 Gitee 账号授权，确认你是仓库成员。通常立即通过。</small></span></label>
+        <label class="opt" for="cv-org"><input type="radio" name="cv" id="cv-org" value="org"><span><b>请主办方确认</b><small>没有代码仓库时使用。主办方核对参赛名单，一般 3 个工作日内完成。</small></span></label>
+      </div>
+      <label class="chk" for="cv-ok"><input type="checkbox" id="cv-ok"><span>我确认自己是这件作品的团队成员。冒领的作品会被下架，账号会被封禁。</span></label>
+      <p class="err" id="cv-err" hidden></p>
+      <div class="dlg-f"><small>认领后可以补全介绍、选择开源协议、开启赛后生命线。</small><button class="btn btn-y" type="submit">提交认领</button></div>
     </div>
   </form>
 </dialog>
@@ -450,7 +483,7 @@ const rng=seed=>{let s=seed||1;return()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=
 
 /* ---------- 存储（仅当前浏览器） ---------- */
 const KEY='kouhai-proto-v1';
-let S={liked:[],saved:[],follow:[],remind:[],comments:{},mine:[]};
+let S={liked:[],saved:[],follow:[],remind:[],comments:{},mine:[],claimed:[],pending:[]};
 try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw))}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const has=(k,id)=>S[k].includes(id);
@@ -468,16 +501,16 @@ const USERS={
  u8:{n:'何夏',h:'hexia',city:'南京',role:'在读研究生 · 城市研究',bio:'关注城市、声音与无障碍。参加黑客松是为了让论文里的东西真的有人用。',c:'#E6D36A',open:['找 Android 开发者'],fans:1530,extra:['e2']},
 };
 const EVL=[
- {id:'e1',name:'Agent Week 48h · 杭州站',short:'AGENT WEEK',s:9,len:2,su:5,city:'杭州',form:'线下',prize:200000,tracks:['智能体工具链','个人助理','企业自动化'],tags:['AI Agent'],org:'西溪开发者社区',size:300,pal:0},
- {id:'e2',name:'城市漫游 Hack · 成都',short:'城市漫游',s:16,len:2,su:10,city:'成都',form:'线下',prize:80000,tracks:['城市数据','文旅体验','无障碍出行'],tags:['公益','城市'],org:'锦江城市实验室',size:160,pal:4},
- {id:'e3',name:'Make it Glow 硬件马拉松',short:'GLOW',s:23,len:3,su:14,city:'深圳',form:'线下',prize:150000,tracks:['可穿戴','智能家居','教育硬件'],tags:['硬件'],org:'华强北创客联盟',size:120,pal:7},
+ {id:'e1',name:'Agent Week 48h · 杭州站',short:'AGENT WEEK',s:9,len:2,su:5,city:'杭州',form:'线下',prize:200000,tracks:['智能体工具链','个人助理','企业自动化'],tags:['AI Agent'],org:'星火开发者社区',size:300,pal:0},
+ {id:'e2',name:'城市漫游 Hack · 成都',short:'城市漫游',s:16,len:2,su:10,city:'成都',form:'线下',prize:80000,tracks:['城市数据','文旅体验','无障碍出行'],tags:['公益','城市'],org:'青柚城市实验室',size:160,pal:4},
+ {id:'e3',name:'Make it Glow 硬件马拉松',short:'GLOW',s:23,len:3,su:14,city:'深圳',form:'线下',prize:150000,tracks:['可穿戴','智能家居','教育硬件'],tags:['硬件'],org:'萤火创客联盟',size:120,pal:7},
  {id:'e4',name:'像素冬眠 Game Jam 72h',short:'冬眠',s:-1,len:3,su:-3,city:'线上',form:'线上',prize:30000,tracks:['主题：冬眠','单人赛','团队赛'],tags:['游戏'],org:'独游互助会',size:900,pal:5},
  {id:'e5',name:'开放教育 Hack',short:'开放教育',s:30,len:2,su:21,city:'线上',form:'线上',prize:50000,tracks:['AI 助教','乡村教育','终身学习'],tags:['教育','AI Agent'],org:'开放课堂基金会',size:400,pal:6},
- {id:'e6',name:'AI for Good 2025 秋季赛 · 上海',short:'AI FOR GOOD',s:-340,len:2,su:-350,city:'上海',form:'线下',prize:300000,tracks:['无障碍','文化保护','社会服务'],tags:['公益','AI Agent'],org:'浦江公益科技联盟',size:420,pal:4},
- {id:'e7',name:'AGI 春季黑客松 2026 · 北京',short:'AGI 春季',s:-180,len:2,su:-190,city:'北京',form:'线下',prize:500000,tracks:['AI 原生应用','开发者工具','企业服务'],tags:['AI Agent','开发者工具'],org:'海淀 AGI 开发者社区',size:600,pal:0},
+ {id:'e6',name:'AI for Good 公益黑客松 · 上海',short:'AI FOR GOOD',s:-340,len:2,su:-350,city:'上海',form:'线下',prize:300000,tracks:['无障碍','文化保护','社会服务'],tags:['公益','AI Agent'],org:'向善科技联盟',size:420,pal:4},
+ {id:'e7',name:'AGI 开发者黑客松 · 北京',short:'AGI BUILD',s:-180,len:2,su:-190,city:'北京',form:'线下',prize:500000,tracks:['AI 原生应用','开发者工具','企业服务'],tags:['AI Agent','开发者工具'],org:'北辰 AGI 社区',size:600,pal:0},
  {id:'e8',name:'链上创作者 Hack',short:'ON-CHAIN',s:-260,len:5,su:-270,city:'线上',form:'线上',prize:100000,tracks:['创作者经济','透明账本','DAO 工具'],tags:['Web3'],org:'开放协议基金会',size:350,pal:6},
- {id:'e9',name:'边缘智能硬件赛 2025 · 深圳',short:'EDGE AI',s:-300,len:3,su:-310,city:'深圳',form:'线下',prize:200000,tracks:['传感器','边缘 AI','办公与家居'],tags:['硬件'],org:'南山硬件实验室',size:150,pal:1},
- {id:'e10',name:'Game Jam 2025 冬 · 主题「信」',short:'信',s:-290,len:3,su:-295,city:'线上',form:'线上',prize:20000,tracks:['主题：信','单人赛','团队赛'],tags:['游戏'],org:'独游互助会',size:780,pal:5},
+ {id:'e9',name:'边缘智能硬件赛 · 深圳',short:'EDGE AI',s:-300,len:3,su:-310,city:'深圳',form:'线下',prize:200000,tracks:['传感器','边缘 AI','办公与家居'],tags:['硬件'],org:'边缘硬件实验室',size:150,pal:1},
+ {id:'e10',name:'Game Jam · 主题「信」',short:'信',s:-290,len:3,su:-295,city:'线上',form:'线上',prize:20000,tracks:['主题：信','单人赛','团队赛'],tags:['游戏'],org:'独游互助会',size:780,pal:5},
 ];
 const EV={};EVL.forEach(e=>{e.start=at(e.s);e.end=at(e.s+e.len-1);e.signup=at(e.su);EV[e.id]=e});
 
@@ -515,10 +548,20 @@ const WORKS=[
 {id:'w16',t:'一键会议纪要',tag:'会议结束的那一刻，待办已经分好人了。',a:['u7'],e:'e7',award:'',s:'sleeping',cov:'terminal',pal:5,ar:'4/3',likes:742,views:9800,tags:['企业服务','AI Agent'],stack:['Electron','whisper.cpp','Ollama'],
  p:'会议纪要没人愿意写，写了也没人看。',so:'本地录音转写，按议题生成纪要，把待办自动分给会上提到的人，并同步到日历。',af:'赛后发现同类产品太多，作者暂停开发。代码可以直接运行，适合当作本地 Agent 的学习样例。'},
 ];
-S.mine.forEach(w=>{if(!WORKS.find(x=>x.id===w.id))WORKS.unshift(w)});
+WORKS.push(
+{id:'w17',t:'桥梁体检员',tag:'用手机拍桥梁裂缝，自动估算裂缝宽度并生成巡检报告。',a:[],team:3,e:'e9',award:'三等奖',s:'unclaimed',cov:'hardware',pal:7,ar:'4/3',likes:318,views:4100,tags:['硬件','公益'],stack:[],src:'主办方公示的获奖名单'},
+{id:'w18',t:'团购接龙助手',tag:'把小区群里的接龙消息自动整理成订单和配送单。',a:[],team:2,e:'e7',award:'',s:'unclaimed',cov:'mobile',pal:4,ar:'3/4',likes:205,views:2900,tags:['AI Agent','企业服务'],stack:[],src:'主办方公示的参赛名单'},
+{id:'w19',t:'盲文点读笔',tag:'扫过印刷文字，笔尖振动出对应的盲文点位。',a:[],team:4,e:'e6',award:'优秀奖',s:'unclaimed',cov:'hardware',pal:2,ar:'1/1',likes:446,views:5600,tags:['公益','硬件'],stack:[],src:'主办方公示的获奖名单'}
+);
+const LIC={w1:'MIT',w2:'Apache-2.0',w3:'MIT',w4:'保留所有权利',w5:'保留所有权利',w6:'MIT',w7:'GPL-3.0',w8:'保留所有权利',w9:'Apache-2.0',w10:'CC BY-NC 4.0',w11:'保留所有权利',w12:'保留所有权利',w13:'MIT',w14:'Apache-2.0',w15:'CC BY-NC 4.0',w16:'MIT'};
+WORKS.forEach(w=>{w.lic=LIC[w.id]||''});
+S.mine.forEach(w=>{w.fresh=true;w.lic=w.lic||'未选择';if(!WORKS.find(x=>x.id===w.id))WORKS.unshift(w)});
 const W=id=>WORKS.find(w=>w.id===id);
+const applyClaim=id=>{const w=W(id);if(w&&w.s==='unclaimed'){w.a=['u1'];w.s='iterating';w.fresh=true;w.lic='未选择';w.stack=['待补全'];w.p=w.tag;w.so='作者刚认领，还没有补充方案细节。';w.af='刚刚认领，作者会在这里持续记录进展。'}};
+S.claimed.forEach(applyClaim);
+const ACTIVE=['iterating','launched','funded'];
 
-const ST={iterating:'持续迭代',launched:'已上线',funded:'获投资',sleeping:'待唤醒'};
+const ST={iterating:'持续迭代',launched:'已上线',funded:'获投资',sleeping:'待唤醒',unclaimed:'待认领'};
 const TRACKS=['全部','AI Agent','公益','硬件','游戏','开发者工具','企业服务','Web3','教育'];
 const POOL=['Demo 我试了，交互很顺。赛后还在更新这点太难得了。','想问下语音部分用的是哪个模型？延迟是怎么压下来的？','我们学校社团想在这个基础上继续做，方便联系你吗？','现场路演的时候就看过，现在比当时完整太多了。','README 写得很清楚，已 star。','这个点子放到企业场景里会更有商业价值。','评委视角：完成度很高，可惜当时时间不够展示完整流程。','封面和交互都很舒服，设计稿可以开源吗？'];
 
@@ -723,12 +766,13 @@ const names=w=>w.a.map(id=>USERS[id].n).join(' · ');
 const worksOf=uid=>WORKS.filter(w=>w.a.includes(uid));
 function userEvents(uid){const ids=new Set([...worksOf(uid).map(w=>w.e),...USERS[uid].extra]);return[...ids].map(id=>EV[id])}
 
+const whoHTML=w=>w.a.length?`<span class="who"><span class="av sm" style="--c:${USERS[w.a[0]].c}">${esc(USERS[w.a[0]].n[0])}</span>${esc(names(w))}</span>`:`<span class="who"><span class="av sm ghost">?</span>待认领 · ${w.team} 人团队</span>`;
 function card(w){
  const e=EV[w.e];
  return`<a class="card" href="#work-${w.id}">
   <div class="cover" style="--ar:${w.ar}">${cvW(w)}<span class="st st-${w.s}"><i></i>${ST[w.s]}</span>${w.award?`<span class="award">${w.award}</span>`:''}</div>
   <div class="c-meta"><h3>${esc(w.t)}</h3>
-   <div class="c-foot"><span class="who"><span class="av sm" style="--c:${USERS[w.a[0]].c}">${esc(USERS[w.a[0]].n[0])}</span>${esc(names(w))}</span>
+   <div class="c-foot">${whoHTML(w)}
    <span class="nums">${ic.heart}${fmtN(likes(w))}<span class="sp"></span><span class="eye-n">${ic.eye}${fmtN(w.views)}</span></span></div>
    <p class="c-ev">${esc(e.name)}</p></div></a>`;
 }
@@ -749,14 +793,15 @@ function lifeline(w){
   else if(w.s==='iterating')lv=R()<(wk?.25:.5)?1+Math.floor(R()*3):0;
   else if(w.s==='launched')lv=R()<(wk?.3:.55)?1+Math.floor(R()*(after<60?4:2.6)):0;
   else lv=R()<Math.min(.9,(wk?.2:.4)+after/300)?1+Math.floor(R()*4):0;
-  if(w.id.startsWith('m')&&rel>=e.len)lv=0;
   cells.push({lv,ev:rel>=0&&rel<e.len});
   if(lv>0){total+=[0,2,4,8,15][lv]+Math.floor(R()*3);last=i;if(rel>=e.len)aw.add(Math.floor(i/7))}
  }
- const lastDay=new Date(start.getTime()+Math.max(0,last)*DAY);
- return{cells,weeks,total,afterWeeks:aw.size,lastAgo:Math.max(0,Math.round((now-lastDay)/DAY)),start};
+ const lastDay=new Date(start.getTime()+Math.max(0,last)*DAY),logs=w.s==='sleeping'?1+Math.floor(R()*3):4+Math.floor(R()*16);
+ return{cells,weeks,total,logs,afterWeeks:aw.size,lastAgo:Math.max(0,Math.round((now-lastDay)/DAY)),start};
 }
 function lifeHTML(w){
+ if(w.s==='unclaimed')return`<div class="life fresh"><p>作者认领并绑定代码仓库后，这里会开始记录每天的提交和开发日志。</p></div>`;
+ if(w.fresh)return`<div class="life fresh"><p>还没有绑定代码仓库。绑定 GitHub 或 Gitee 仓库后，这里会开始记录每天的提交；硬件、设计这类提交少的作品，可以用开发日志记录进展。</p><div class="row"><button class="btn btn-ink btn-sm" data-act="bind">${ic.git}绑定代码仓库</button><button class="btn btn-sm" data-act="devlog">写一篇开发日志</button></div></div>`;
  const L=lifeline(w),e=EV[w.e];
  if(!L)return`<div class="life"><p style="color:var(--ink-2)">比赛还没开始，提交记录会在开赛后自动出现在这里。</p></div>`;
  const evCol=2;
@@ -770,6 +815,7 @@ function lifeHTML(w){
   <div class="life-stats">
    <div><b>${L.total.toLocaleString('en-US')}</b><span>累计提交</span></div>
    <div><b>${L.afterWeeks}</b><span>赛后活跃周数</span></div>
+   <div><b>${L.logs}</b><span>开发日志</span></div>
    <div class="${L.lastAgo>60?'warn':''}"><b>${L.lastAgo===0?'今天':L.lastAgo+' 天前'}</b><span>最近一次提交</span></div>
    <div><b>${diff(e.end)>=0?'进行中':Math.abs(diff(e.end))+' 天'}</b><span>距离比赛结束</span></div>
   </div>
@@ -786,10 +832,12 @@ function lifeHTML(w){
 const UI={tab:'rec',track:'全部',q:'',evS:'全部',evF:'全部',evT:'全部',pTab:'works'};
 function feedList(){
  let list=WORKS.slice();
- if(UI.tab==='rec')list.sort((a,b)=>(b.likes+b.views/25+(b.s!=='sleeping'?800:0))-(a.likes+a.views/25+(a.s!=='sleeping'?800:0)));
+ const sc=w=>w.likes+w.views/25+(ACTIVE.includes(w.s)?800:0)-(w.s==='unclaimed'?1500:0);
+ if(UI.tab==='rec')list.sort((a,b)=>sc(b)-sc(a));
  if(UI.tab==='new')list.sort((a,b)=>(b.created||EV[b.e].s)-(a.created||EV[a.e].s));
  if(UI.tab==='award')list=list.filter(w=>w.award);
- if(UI.tab==='iter')list=list.filter(w=>w.s!=='sleeping');
+ if(UI.tab==='iter')list=list.filter(w=>ACTIVE.includes(w.s));
+ if(UI.tab==='claim')list=list.filter(w=>w.s==='unclaimed');
  if(UI.tab==='wake')list=list.filter(w=>w.s==='sleeping');
  if(UI.track!=='全部')list=list.filter(w=>w.tags.includes(UI.track));
  if(UI.q){const q=UI.q.toLowerCase();list=list.filter(w=>[w.t,w.tag,names(w),EV[w.e].name,...w.tags,...w.stack].join(' ').toLowerCase().includes(q))}
@@ -799,20 +847,22 @@ function feedHTML(){
  const list=feedList();
  let pre='';
  if(UI.tab==='wake')pre=`<div class="note"><span><b>唤醒计划</b>　这些作品的作者已开放接手。申请通过后可获得仓库协作权限，原作者保留署名。</span><span class="mono">${list.length} 件待唤醒</span></div>`;
+ if(UI.tab==='claim')pre=`<div class="note"><span><b>作品认领</b>　这些档案根据主办方公示的名单自动建立，只收录标题、简介和来源，封面是系统生成的占位图。是你的作品？点进去认领。</span><span class="mono">${list.length} 件待认领</span></div>`;
  if(UI.q)pre+=`<div class="note"><span>搜索「<b>${esc(UI.q)}</b>」，找到 ${list.length} 件作品</span><button class="btn btn-sm" data-act="clearq">清除搜索</button></div>`;
  return pre+(list.length?`<div class="masonry">${list.map(card).join('')}</div>`:`<div class="empty">这个分类下还没有作品。换一个赛道看看，或者<a href="#home" data-act="publish">发布第一件</a>。</div>`);
 }
 function viewHome(){
  const up=EVL.filter(e=>evState(e)!=='ended').sort((a,b)=>a.s-b.s);
- const iterN=WORKS.filter(w=>w.s!=='sleeping').length,wakeN=WORKS.filter(w=>w.s==='sleeping').length;
- const tabs=[['rec','推荐'],['new','最新'],['award','获奖作品'],['iter','仍在更新',iterN],['wake','待唤醒',wakeN]];
+ const iterN=WORKS.filter(w=>ACTIVE.includes(w.s)).length,wakeN=WORKS.filter(w=>w.s==='sleeping').length,claimN=WORKS.filter(w=>w.s==='unclaimed').length;
+ const weekN=WORKS.filter(w=>ACTIVE.includes(w.s)&&!w.fresh&&(lifeline(w)||{lastAgo:99}).lastAgo<=7).length;
+ const tabs=[['rec','推荐'],['new','最新'],['award','获奖作品'],['iter','仍在更新',iterN],['wake','待唤醒',wakeN],['claim','待认领',claimN]];
  return`<section class="wrap intro">
   <div><h1>比赛会结束，<br><span class="hl">作品不该。</span></h1>
   <p class="lede">收录全网黑客松，也收下每一件参赛作品。赛后继续更新、被人看见、被接手、被投资。</p></div>
   <div class="pulse">
-   <div><b>128</b><span>在录赛事</span></div>
-   <div><b>3,412</b><span>收录作品</span></div>
-   <div><b>27</b><span>本周仍在更新</span></div>
+   <div><b>${EVL.length}</b><span>收录赛事（示例）</span></div>
+   <div><b>${WORKS.length}</b><span>收录作品（示例）</span></div>
+   <div><b>${weekN}</b><span>本周有新提交</span></div>
   </div></section>
  <section class="wrap radar">
   <div class="sec-h"><h2>赛事雷达<span class="sub">近期可报名与进行中</span></h2><a class="more" href="#events">全部赛事 ${ic.arrow}</a></div>
@@ -838,19 +888,27 @@ function comments(w){
 }
 function viewWork(id){
  const w=W(id);if(!w)return viewMissing();
- const e=EV[w.e],R=rng(hash(w.id+'d')),cm=comments(w),sleeping=w.s==='sleeping';
- const health=sleeping?`<div class="health" style="--c:var(--sleep)"><i></i>Demo 已离线 · 已自动存档 ${fmtF(new Date(now-(30+Math.floor(R()*90))*DAY))} 的快照</div>`:`<div class="health" style="--c:var(--ok)"><i></i>Demo 在线 · 响应 ${180+Math.floor(R()*400)}ms · ${1+Math.floor(R()*10)} 小时前检测</div>`;
+ const e=EV[w.e],R=rng(hash(w.id+'d')),unc=w.s==='unclaimed',sleeping=w.s==='sleeping',cm=unc?[]:comments(w);
+ const health=w.fresh?`<div class="health" style="--c:var(--ink-3)"><i></i>还没有填写 Demo 地址，填写后每天自动检测是否在线</div>`:sleeping?`<div class="health" style="--c:var(--sleep)"><i></i>Demo 已离线 · 已自动存档 ${fmtF(new Date(now-(30+Math.floor(R()*90))*DAY))} 的快照</div>`:`<div class="health" style="--c:var(--ok)"><i></i>Demo 在线 · 响应 ${180+Math.floor(R()*400)}ms · ${1+Math.floor(R()*10)} 小时前检测</div>`;
  const more=WORKS.filter(x=>x.e===w.e&&x.id!==w.id).slice(0,5);
- return`<div class="wrap">
- <nav class="crumb" aria-label="位置"><a href="#home">发现作品</a><span>/</span><a href="#event-${e.id}">${esc(e.name)}</a><span>/</span><span>${esc(w.t)}</span></nav>
- <div class="d-grid">
-  <div class="d-head">
-   <div class="d-cover">${cvW(w,'16/10')}</div>
-   <div class="d-title"><h1>${esc(w.t)}</h1><span class="stx st-${w.s}"><i></i>${ST[w.s]}</span></div>
-   <p class="d-tag">${esc(w.tag)}</p>
-  </div>
-  <aside class="d-side"><div class="d-side-in">
-   <div class="box">
+ const open=w.lic&&w.lic!=='保留所有权利'&&w.lic!=='未选择';
+ const evBox=`<div class="box">
+    <h3>来自赛事</h3>
+    <a class="evcard" href="#event-${e.id}">${cvE(e,'16/10',360)}<div><b>${esc(e.name)}</b><span>${fmtF(e.start)} · ${e.form==='线上'?'线上':e.city}${w.award?` · ${w.award}`:''}</span></div></a>
+   </div>`;
+ let side,body;
+ if(unc){
+  const pend=has('pending',w.id);
+  side=`<div class="box adopt"><h3>这是你的作品吗？</h3><p>这份档案根据${esc(w.src)}自动建立，只收录了标题、简介和来源，封面是系统生成的占位图。认领后可以补全介绍、上传封面、绑定代码仓库，开始记录赛后生命线。</p>${pend?'<button class="btn btn-block" disabled>已提交，等待主办方核对</button>':`<button class="btn btn-y btn-block" data-act="claim" data-id="${w.id}">${ic.hand}认领作品</button>`}</div>
+   <div class="box"><h3>团队</h3><p style="color:var(--ink-2);font-size:13.5px">${w.team} 人团队。成员名单来自主办方公示，作者认领后自行决定展示哪些信息。</p><button class="btn btn-sm" style="margin-top:12px" data-act="takedown">不是我们的作品 / 要求下架</button></div>
+   ${evBox}`;
+  body=`<section><h2>赛后生命线</h2>${lifeHTML(w)}</section>
+   <section><h2>项目介绍</h2><div class="prose">
+    <div><h4>公开简介</h4><p>${esc(w.tag)}</p></div>
+    <div><h4>收录来源</h4><p>${esc(e.name)}，${esc(w.src)}（示例）。其余内容等作者认领后补全。</p></div>
+   </div></section>`;
+ }else{
+  side=`<div class="box">
     <div class="act-row">
      <button class="btn ${has('liked',w.id)?'on':''}" data-act="like" data-id="${w.id}" aria-pressed="${has('liked',w.id)}">${ic.heart}<span>${has('liked',w.id)?'已喜欢':'喜欢'}</span></button>
      <button class="btn ${has('saved',w.id)?'on':''}" data-act="save" data-id="${w.id}" aria-pressed="${has('saved',w.id)}">${ic.save}<span>${has('saved',w.id)?'已收藏':'收藏'}</span></button>
@@ -860,28 +918,24 @@ function viewWork(id){
    <div class="box links">
     <h3>体验与代码</h3>
     <button class="btn btn-ink btn-block" data-act="demo" data-id="${w.id}">${ic.ext}${sleeping?'查看存档快照':'打开在线 Demo'}</button>
-    <button class="btn btn-block" data-act="repo">${ic.git}查看代码仓库</button>
+    <button class="btn btn-block" data-act="${w.fresh?'bind':'repo'}">${ic.git}${w.fresh?'绑定代码仓库':'查看代码仓库'}</button>
     ${health}
    </div>
-   ${sleeping?`<div class="box adopt"><h3>开放接手</h3><p>作者不再维护这件作品，欢迎有兴趣的人继续做下去。申请通过后获得仓库协作权限，原作者保留署名。</p><button class="btn btn-y btn-block" data-act="adopt">${ic.hand}申请接手</button></div>`:''}
+   ${sleeping?`<div class="box adopt"><h3>开放接手</h3><p>作者不再维护这件作品，欢迎有兴趣的人继续做下去。按 ${esc(w.lic)} 协议接手，申请通过后获得仓库协作权限，原作者保留署名。</p><button class="btn btn-y btn-block" data-act="adopt">${ic.hand}申请接手</button></div>`:''}
    <div class="box">
     <h3>团队</h3>
     ${w.a.map(uid=>{const u=USERS[uid],me=uid==='u1';return`<div class="person">${av(uid,'md')}<div class="grow"><a class="n" href="#user-${uid}">${esc(u.n)}</a><div class="r">${esc(u.role)}</div></div>${me?'<span class="r">我</span>':`<button class="btn btn-sm ${has('follow',uid)?'on':''}" data-act="follow" data-id="${uid}">${has('follow',uid)?'已关注':'关注'}</button>`}</div>`}).join('')}
-    ${!sleeping?`<button class="btn btn-block" style="margin-top:10px" data-act="join">${ic.users}申请加入团队</button>`:''}
+    ${!sleeping&&!w.a.includes('u1')?`<button class="btn btn-block" style="margin-top:10px" data-act="join">${ic.users}申请加入团队</button>`:''}
    </div>
-   <div class="box">
-    <h3>来自赛事</h3>
-    <a class="evcard" href="#event-${e.id}">${cvE(e,'16/10',360)}<div><b>${esc(e.name)}</b><span>${fmtF(e.start)} · ${e.form==='线上'?'线上':e.city}${w.award?` · ${w.award}`:''}</span></div></a>
-   </div>
-  </div></aside>
-  <div class="d-body">
-   <section><h2>赛后生命线<small>从赛前两周到今天，每一格是一天的提交</small></h2>${lifeHTML(w)}</section>
+   ${evBox}`;
+  body=`<section><h2>赛后生命线<small>从赛前两周到今天，每一格是一天的提交；开发日志单独计数</small></h2>${lifeHTML(w)}</section>
    <section><h2>项目介绍</h2><div class="prose">
     <div><h4>要解决的问题</h4><p>${esc(w.p)}</p></div>
     <div><h4>我们的方案</h4><p>${esc(w.so)}</p></div>
     <div><h4>赛后进展</h4><p>${esc(w.af)}</p></div>
    </div></section>
-   <section><h2>技术栈</h2><div class="stack">${w.stack.map(s=>`<span>${esc(s)}</span>`).join('')}</div></section>
+   <section><h2>技术栈与协议</h2><div class="stack">${w.stack.map(s=>`<span>${esc(s)}</span>`).join('')}</div>
+    <p class="lic"><span>开源协议</span><b>${esc(w.lic||'未选择')}</b><span>${w.lic==='保留所有权利'?'不开放二次开发':open?'允许在协议范围内使用和继续开发':'作者还没有选择协议'}</span></p></section>
    <section><h2>评论<small>${cm.length} 条</small></h2>
     <form class="cmt-form" id="cmt-form" data-id="${w.id}">
      <label for="cmt-in" class="mono" style="font-size:12px;color:var(--ink-3)">以 林溪 的身份评论</label>
@@ -889,8 +943,18 @@ function viewWork(id){
      <div class="row"><span>评论会同步通知作者</span><button class="btn btn-ink btn-sm" type="submit">发表评论</button></div>
     </form>
     <div class="cmts">${cm.map(c=>`<div class="cmt">${av(c.u)}<div><div class="h"><a href="#user-${c.u}">${esc(USERS[c.u].n)}</a><span>${c.ago}</span></div><p>${esc(c.t)}</p></div></div>`).join('')}</div>
-   </section>
+   </section>`;
+ }
+ return`<div class="wrap">
+ <nav class="crumb" aria-label="位置"><a href="#home">发现作品</a><span>/</span><a href="#event-${e.id}">${esc(e.name)}</a><span>/</span><span>${esc(w.t)}</span></nav>
+ <div class="d-grid">
+  <div class="d-head">
+   <div class="d-cover">${cvW(w,'16/10')}</div>
+   <div class="d-title"><h1>${esc(w.t)}</h1><span class="stx st-${w.s}"><i></i>${ST[w.s]}</span></div>
+   <p class="d-tag">${esc(w.tag)}</p>
   </div>
+  <aside class="d-side"><div class="d-side-in">${side}</div></aside>
+  <div class="d-body">${body}</div>
  </div>
  ${more.length?`<section class="related"><div class="sec-h"><h2>同场作品<span class="sub">${esc(e.name)}</span></h2><a class="more" href="#event-${e.id}">查看全部 ${ic.arrow}</a></div><div class="masonry">${more.map(card).join('')}</div></section>`:'<div style="height:64px"></div>'}
  </div>`;
@@ -916,7 +980,7 @@ function viewEvents(){
   <div class="ev-date"><b>${pad(e.start.getDate())}</b><span>${e.start.getFullYear()}.${pad(e.start.getMonth()+1)}</span></div>
   ${cvE(e,'16/9',480)}
   <div class="ev-info"><h3>${esc(e.name)}</h3>
-   <div class="m"><span>${ic.pin}${e.form==='线上'?'线上':e.city}</span><span>${ic.clock}${e.len*24} 小时</span><span>${ic.users}${e.size} 人</span><span>${esc(e.org)}</span></div>
+   <div class="m"><span>${ic.pin}${e.form==='线上'?'线上':e.city}</span><span>${ic.clock}${e.len*24} 小时</span><span>${ic.users}${e.size} 人</span><span>${esc(e.org)}（示例）</span></div>
    <div class="tk">${e.tracks.map(t=>`<span>${esc(t)}</span>`).join('')}</div></div>
   <div class="ev-right"><span class="prize">${prizeT(e.prize)}</span><span class="pill ${s}"><i></i>${countdown(e)}</span>${s==='ended'?`<small>收录作品 ${n} 件</small>`:''}</div>
  </a>`}).join(''):'<div class="empty">没有符合条件的赛事，试试放宽筛选条件。</div>'}</div>
@@ -930,7 +994,7 @@ function viewEvent(id){
  const per=Math.round(e.prize/e.tracks.length/10000*10)/10;
  const similar=WORKS.filter(w=>w.e!==e.id&&w.tags.some(t=>e.tags.includes(t))).slice(0,5);
  let worksSec;
- if(s==='ended')worksSec=`<section class="e-sec"><h2>本届作品<small>${works.length} 件 · 赛后仍在更新 ${works.filter(w=>w.s!=='sleeping').length} 件</small></h2>${works.length?`<div class="masonry">${works.map(card).join('')}</div>`:'<div class="empty">这场比赛的作品还在整理中。</div>'}</section>`;
+ if(s==='ended')worksSec=`<section class="e-sec"><h2>本届作品<small>${works.length} 件 · 赛后仍在更新 ${works.filter(w=>ACTIVE.includes(w.s)).length} 件 · 待认领 ${works.filter(w=>w.s==='unclaimed').length} 件</small></h2>${works.length?`<div class="masonry">${works.map(card).join('')}</div>`:'<div class="empty">这场比赛的作品还在整理中。</div>'}</section>`;
  else if(s==='live')worksSec=`<section class="e-sec"><h2>作品提交中<small>还剩 ${Math.max(0,diff(e.end))+1} 天截止</small></h2><div class="note"><span>参赛者提交后，作品会在颁奖结束时自动公开，并开始记录赛后生命线。</span><button class="btn btn-y btn-sm" data-act="publish" data-ev="${e.id}">提交作品</button></div>${works.length?`<div class="masonry">${works.map(card).join('')}</div>`:''}</section>`;
  else worksSec=`<section class="e-sec"><h2>同主题往届作品<small>看看别人在这个方向上做过什么</small></h2><div class="masonry">${similar.map(card).join('')}</div></section>`;
  const reminded=has('remind',e.id);
@@ -1050,6 +1114,11 @@ document.addEventListener('click',ev=>{
   case'msg':toast(`原型：私信 ${USERS[id].n} 的功能还在设计中`);break;
   case'editp':toast('原型：资料编辑还在设计中');break;
   case'publish':openPub(t.dataset.ev);break;
+  case'claim':openClaim(id);break;
+  case'close-claim':claimDlg.close();break;
+  case'takedown':toast('已收到申请，核实前先隐藏这份档案（原型演示）');break;
+  case'bind':toast('原型：将跳转到 GitHub / Gitee 授权页');break;
+  case'devlog':toast('原型：开发日志编辑器还在设计中');break;
   case'close':dlg.close();break;
  }
 });
@@ -1077,13 +1146,31 @@ form.addEventListener('submit',ev=>{
  const t=document.getElementById('pf-title').value.trim(),tag=document.getElementById('pf-tag').value.trim();
  if(!t||!tag){err.textContent=!t?'请填写作品名':'请写一句话介绍，让人知道它是做什么的';err.hidden=false;return}
  const e=document.getElementById('pf-event').value,s=document.getElementById('pf-status').value,cov=(form.querySelector('input[name="pf-cov"]:checked')||{}).value||'chat';
+ const lic=document.getElementById('pf-license').value;
+ if(s==='sleeping'&&lic==='保留所有权利'){err.textContent='开放接手的作品不能选「保留所有权利」，请换一个允许继续开发的协议';err.hidden=false;return}
  const stack=document.getElementById('pf-stack').value.split(/[,，、]/).map(x=>x.trim()).filter(Boolean);
  const ki=KINDS.findIndex(k=>k[0]===cov);
  const w={id:'m'+Date.now().toString(36),t,tag,a:['u1'],e,award:'',s,cov,pal:[0,6,7,4,1,5,3][ki]||0,ar:'4/3',likes:0,views:1,tags:EV[e].tags.slice(),stack:stack.length?stack:['未填写'],
-  p:tag,so:'作者还没有补充方案细节。',af:s==='sleeping'?'作者开放接手，欢迎联系。':'刚刚发布，作者会在这里持续记录进展。',created:1};
+  lic,fresh:true,p:tag,so:'作者还没有补充方案细节。',af:s==='sleeping'?'作者开放接手，欢迎联系。':'刚刚发布，作者会在这里持续记录进展。',created:1};
  WORKS.unshift(w);S.mine.push(w);save();
  form.reset();document.getElementById('pf-cov-chat').checked=true;dlg.close();
  location.hash='#work-'+w.id;toast('作品已发布，赛后生命线开始记录');
+});
+
+/* ---------- 认领作品 ---------- */
+const claimDlg=document.getElementById('claim'),claimForm=document.getElementById('claim-form'),cvErr=document.getElementById('cv-err');
+function openClaim(id){
+ const w=W(id);if(!w)return;
+ claimDlg.dataset.id=id;claimForm.reset();cvErr.hidden=true;
+ document.getElementById('claim-name').textContent=`「${w.t}」· ${EV[w.e].name} · ${w.team} 人团队`;
+ if(claimDlg.showModal)claimDlg.showModal();else claimDlg.setAttribute('open','');
+}
+claimForm.addEventListener('submit',ev=>{
+ ev.preventDefault();
+ if(!document.getElementById('cv-ok').checked){cvErr.textContent='请先勾选确认，你是这件作品的团队成员';cvErr.hidden=false;return}
+ const id=claimDlg.dataset.id,way=(claimForm.querySelector('input[name="cv"]:checked')||{}).value;
+ if(way==='org'){if(!has('pending',id))toggle('pending',id);claimDlg.close();rerender();toast('已提交给主办方核对，通过后会通知你（原型演示）');return}
+ S.claimed.push(id);save();applyClaim(id);claimDlg.close();rerender();toast('认领成功，作品已进入你的主页（原型演示：跳过了仓库授权）');
 });
 
 route();
